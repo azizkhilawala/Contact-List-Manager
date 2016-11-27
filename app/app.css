@@ -1,0 +1,38 @@
+/* app css stylesheet */
+
+.menu
+{
+    margin-bottom: 2em;
+    padding: 0 0 .5em;
+
+    list-style: none;
+
+    border-bottom: .1em solid black;
+}
+
+.menu:before
+{
+    content: '[';
+}
+
+.menu:after
+{
+    content: ']';
+}
+
+.menu > li
+{
+    display: inline;
+}
+
+.menu > li + li:before
+{
+    padding-right: .3em;
+
+    content: '|';
+}
+
+.no-border-radius
+{
+    border-radius: 0!important;
+}
