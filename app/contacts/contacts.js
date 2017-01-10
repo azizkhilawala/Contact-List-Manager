@@ -13,86 +13,86 @@ firebase.initializeApp(config);
 //angular module Initialize
 angular.module('myApp.contacts', ['ngRoute', 'firebase'])
 
-//configure routes
-.config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/contacts', {
-        templateUrl: 'contacts/contacts.html',
-        controller: 'contactsCtrl'
-    });
-}])
+    //configure routes
+    .config(['$routeProvider', function($routeProvider) {
+        $routeProvider.when('/contacts', {
+            templateUrl: 'contacts/contacts.html',
+            controller: 'contactsCtrl'
+        });
+    }])
 
-//controller logic begins
-.controller('contactsCtrl', ['$scope', '$firebaseObject', '$firebaseArray', function($scope, $firebaseObject, $firebaseArray) {
+    //controller logic begins
+    .controller('contactsCtrl', ['$scope', '$firebaseObject', '$firebaseArray', function($scope, $firebaseObject, $firebaseArray) {
 
-    //create refs to firebase database
-    var ref = firebase.database().ref();
+        //create refs to firebase database
+        var ref = firebase.database().ref();
 
-    $scope.contacts = $firebaseArray(ref);
-    $scope.addFormShow = true;
-    $scope.editFormShow = false;
+        $scope.contacts = $firebaseArray(ref);
+        $scope.addFormShow = true;
+        $scope.editFormShow = false;
 
-    $scope.showEditForm = function(contact) {
-        $scope.addFormShow = false;
-        $scope.editFormShow = true;
+        $scope.showEditForm = function(contact) {
+            $scope.addFormShow = false;
+            $scope.editFormShow = true;
 
-        $scope.id = contact.$id;
-        $scope.name = contact.name;
-        $scope.email = contact.email;
-        $scope.phone = contact.phone;
+            $scope.id = contact.$id;
+            $scope.name = contact.name;
+            $scope.email = contact.email;
+            $scope.phone = contact.phone;
 
-    };
+        };
 
 
-    $scope.addContact = function() {
+        $scope.addContact = function() {
 
-        $scope.contacts.$add({
-            name: $scope.name,
-            email: $scope.email,
-            phone: $scope.phone
-        }).then(function(ref) {
+            $scope.contacts.$add({
+                name: $scope.name,
+                email: $scope.email,
+                phone: $scope.phone
+            }).then(function(ref) {
 
-            console.log("added contact " + ref);
+                console.log("added contact " + ref);
 
-            var id = "";
+                var id = "";
 
-            ref.on('value', snap => console.log(snap.val(), snap.key));
+                ref.on('value', snap => console.log(snap.val(), snap.key));
 
-            //short way of writing using es6 arrow functions
-            ref.on('value', snap => id = snap.key);
+                //short way of writing using es6 arrow functions
+                ref.on('value', snap => id = snap.key);
 
-            //traditional way of writing
-            // ref.on('value', function(snap) {
-            //     return console.log(snap.key);
-            // });
+                //traditional way of writing
+                // ref.on('value', function(snap) {
+                //     return console.log(snap.key);
+                // });
+
+                $scope.name = '';
+                $scope.email = '';
+                $scope.phone = '';
+            });
+        }; //add contact ends here
+
+        $scope.editContact = function() {
+            var id = $scope.id;
+            var record = $scope.contacts.$getRecord(id);
+
+            record.name = $scope.name;
+            record.email = $scope.email;
+            record.phone = $scope.phone;
+
+            $scope.contacts.$save(record).then(function(ref) {
+                ref.on('value', snap => console.log(snap.key));
+            });
 
             $scope.name = '';
             $scope.email = '';
             $scope.phone = '';
-        });
-    }; //add contact ends here
 
-    $scope.editContact = function() {
-        var id = $scope.id;
-        var record = $scope.contacts.$getRecord(id);
+            $scope.addFormShow = true;
+            $scope.editFormShow = false;
+        };
 
-        record.name = $scope.name;
-        record.email = $scope.email;
-        record.phone = $scope.phone;
+        $scope.removeContact = function(contact) {
+            $scope.contacts.$remove(contact);
+        };
 
-        $scope.contacts.$save(record).then(function(ref) {
-            ref.on('value', snap => console.log(snap.key));
-        });
-
-        $scope.name = '';
-        $scope.email = '';
-        $scope.phone = '';
-
-        $scope.addFormShow = true;
-        $scope.editFormShow = false;
-    };
-
-    $scope.removeContact = function(contact) {
-        $scope.contacts.$remove(contact);
-    };
-
-}]);
+    }]);
